@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VTAC 注册信息表 · VTAC Registration Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#17293c;--ink-soft:#4a6076;--muted:#7688a0;--paper:#eef1f5;--card:#ffffff;--line:#dbe2ea;--line-strong:#c3cede;
+  --field:#f6f8fb;--accent:#1f6f5b;--accent-deep:#155546;--accent-tint:#e5f0ec;--amber:#9a6408;--amber-tint:#fbf1de;
+  --danger:#b23b3b;--danger-tint:#f9e9e9;--shadow:0 1px 2px rgba(23,41,60,.04),0 8px 28px rgba(23,41,60,.06);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 84px);-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;font-size:15px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e8eef5;--ink-soft:#a9b8c8;--muted:#8496a8;--paper:#0e1720;--card:#16222e;--line:#26343f;--line-strong:#33475a;--field:#101b25;--accent:#3fae90;--accent-deep:#5cc3a7;--accent-tint:#16302a;--amber:#d6a44a;--amber-tint:#2a2214;--danger:#e07a7a;--danger-tint:#301a1a;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--ink:#e8eef5;--ink-soft:#a9b8c8;--muted:#8496a8;--paper:#0e1720;--card:#16222e;--line:#26343f;--line-strong:#33475a;--field:#101b25;--accent:#3fae90;--accent-deep:#5cc3a7;--accent-tint:#16302a;--amber:#d6a44a;--amber-tint:#2a2214;--danger:#e07a7a;--danger-tint:#301a1a;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35)}
+.masthead{max-width:900px;margin:0 auto;padding:44px 22px 8px}
+.crest{display:flex;align-items:center;gap:10px;color:var(--accent);font-weight:600;letter-spacing:.02em;font-size:14px}
+.crest svg{width:20px;height:20px}
+h1{font-family:"Newsreader",Georgia,"Songti SC",serif;font-weight:500;font-size:clamp(30px,6vw,46px);line-height:1.08;margin:14px 0 4px;letter-spacing:-.01em}
+h1 .en{display:block;font-size:.52em;color:var(--ink-soft);font-weight:400;margin-top:6px;letter-spacing:0}
+.lede{max-width:64ch;color:var(--ink-soft);margin:16px 0 0;font-size:14.5px}
+.lede .en{display:block;color:var(--muted);margin-top:6px;font-size:13px;line-height:1.55}
+.notice{display:flex;gap:10px;margin-top:18px;background:var(--amber-tint);color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 30%,transparent);padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.5;align-items:flex-start}
+.notice svg{width:17px;height:17px;flex:none;margin-top:1px}
+.notice b{font-weight:600}
+.railwrap{position:sticky;top:0;z-index:40;padding-top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:26px}
+.rail{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:14px}
+.progress{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-deep));transition:width .35s ease}
+.railmeta{font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.savechip{font-size:12px;color:var(--accent);white-space:nowrap;display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .3s}
+.savechip.show{opacity:1}.savechip svg{width:13px;height:13px}
+main{max-width:900px;margin:0 auto;padding:26px 22px 40px}
+.section{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;scroll-margin-top:96px}
+.sec-head{display:flex;align-items:baseline;gap:14px;padding:22px 24px 6px}
+.sec-num{font-family:"Newsreader",serif;font-size:22px;color:var(--accent);font-weight:500;line-height:1;flex:none;width:1.4em}
+.sec-title{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em}
+.sec-title .en{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:3px}
+.sec-body{padding:14px 24px 24px}
+.sec-note{background:var(--field);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:11px 14px;margin:2px 0 18px;font-size:13px;color:var(--ink-soft)}
+.sec-note .en{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+.grid .full{grid-column:1/-1}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+label.lb{font-size:13px;font-weight:500;color:var(--ink);line-height:1.35}
+label.lb .en{color:var(--muted);font-weight:400}
+label.lb .req{color:var(--danger);margin-left:2px}
+label.lb .hint{display:block;color:var(--amber);font-weight:400;font-size:11.5px;margin-top:2px}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=password],textarea,select{font-family:inherit;font-size:14.5px;color:var(--ink);background:var(--field);border:1px solid var(--line-strong);border-radius:9px;padding:10px 12px;width:100%;transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical;min-height:56px;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+input.invalid,textarea.invalid,select.invalid,.yn.invalid{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-tint)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%237688a0' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+::placeholder{color:var(--muted);opacity:.7}
+.yn{display:inline-flex;background:var(--field);border:1px solid var(--line-strong);border-radius:9px;padding:3px;gap:3px;align-self:flex-start;flex-wrap:wrap}
+.yn label{position:relative;cursor:pointer}
+.yn input{position:absolute;opacity:0;width:0;height:0}
+.yn span{display:block;padding:6px 18px;border-radius:7px;font-size:13.5px;font-weight:500;color:var(--ink-soft);transition:all .12s}
+.yn input:checked+span{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(31,111,91,.35)}
+.radio-list{display:flex;flex-direction:column;gap:2px}
+.radio-list label{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13.5px;transition:background .12s;border:1px solid transparent}
+.radio-list label:hover{background:var(--field)}
+.radio-list input{margin-top:2px;accent-color:var(--accent);flex:none}
+.radio-list label:has(input:checked){background:var(--accent-tint);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
+.radio-list .en{color:var(--muted);font-size:12px}
+.file-field{display:flex;flex-direction:column;gap:8px}
+.dropzone{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line-strong);border-radius:10px;padding:13px 15px;background:var(--field);cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.drag{border-color:var(--accent);background:var(--accent-tint)}
+.dropzone svg{width:21px;height:21px;color:var(--accent);flex:none}
+.dz-text{font-size:13px;color:var(--ink-soft)}.dz-text b{color:var(--accent);font-weight:600}
+.dz-text small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.filelist{display:flex;flex-direction:column;gap:6px}
+.filechip{display:flex;align-items:center;gap:10px;background:var(--accent-tint);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:8px;padding:7px 10px;font-size:12.5px}
+.filechip svg{width:15px;height:15px;color:var(--accent);flex:none}
+.filechip .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.filechip .sz{color:var(--muted);font-size:11px;flex:none}
+.filechip button{border:none;background:none;color:var(--muted);cursor:pointer;padding:2px;line-height:0;border-radius:4px}
+.filechip button:hover{color:var(--danger);background:var(--danger-tint)}
+.rows{display:flex;flex-direction:column;gap:14px}
+.rowcard{border:1px solid var(--line);border-radius:11px;padding:16px;background:var(--field);position:relative}
+.rowcard .rowtag{position:absolute;top:-9px;left:14px;background:var(--card);border:1px solid var(--line);color:var(--ink-soft);font-size:11px;font-weight:600;padding:1px 9px;border-radius:99px}
+.rowcard .rmrow{position:absolute;top:10px;right:10px;border:none;background:none;color:var(--muted);cursor:pointer;padding:4px;line-height:0;border-radius:6px}
+.rowcard .rmrow:hover{color:var(--danger);background:var(--danger-tint)}
+.rowcard .grid{gap:12px 14px;margin-top:4px}
+.addrow{display:inline-flex;align-items:center;gap:7px;margin-top:14px;background:none;border:1px dashed var(--line-strong);color:var(--accent);font-family:inherit;font-size:13px;font-weight:500;padding:9px 16px;border-radius:9px;cursor:pointer;transition:all .15s}
+.addrow:hover{border-color:var(--accent);background:var(--accent-tint)}.addrow svg{width:15px;height:15px}
+.checkline{display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px}
+.checkline input{margin-top:2px;width:16px;height:16px;accent-color:var(--accent);flex:none}
+.checkline .en{color:var(--muted);font-size:12px}
+.agree{display:flex;gap:11px;align-items:flex-start;cursor:pointer;padding:14px 16px;border:1px solid var(--line-strong);border-radius:10px;background:var(--field);transition:border-color .15s}
+.agree:hover{border-color:var(--accent)}
+.agree.invalid{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-tint)}
+.agree input{width:18px;height:18px;margin-top:1px;flex:none;accent-color:var(--accent)}
+.agree .t{font-size:13px;line-height:1.5}.agree .t .en{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.submitbar{position:sticky;bottom:0;z-index:30;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:14px 22px calc(14px + env(safe-area-inset-bottom,0px));margin-top:8px}
+.submitinner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
+.submit-note{font-size:12.5px;color:var(--muted);flex:1;min-width:180px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-size:15px;font-weight:600;padding:13px 26px;border-radius:11px;border:none;cursor:pointer;transition:transform .1s,box-shadow .15s,background .15s}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(31,111,91,.3)}
+.btn-primary:hover{background:var(--accent-deep)}.btn-primary:active{transform:translateY(1px)}
+.btn-primary:disabled{opacity:.6;cursor:progress}.btn svg{width:18px;height:18px}
+.btn-ghost{background:none;border:1px solid var(--line-strong);color:var(--ink-soft);font-size:13px;padding:10px 16px}
+.btn-ghost:hover{border-color:var(--danger);color:var(--danger)}
+.errbox{display:none;background:var(--danger-tint);border:1px solid var(--danger);border-radius:11px;padding:14px 18px;margin-bottom:20px;font-size:13px}
+.errbox.show{display:block}.errbox h4{margin:0 0 8px;color:var(--danger);font-size:14px}
+.errbox ul{margin:0;padding-left:18px;color:var(--ink-soft)}.errbox a{color:var(--danger);cursor:pointer}
+.done{display:none;text-align:center;padding:56px 24px}
+.done.show{display:block}
+.done .ring{width:66px;height:66px;border-radius:50%;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.done .ring svg{width:34px;height:34px;color:var(--accent)}
+.done h2{font-family:"Newsreader",serif;font-weight:500;font-size:28px;margin:0 0 8px}
+.done p{color:var(--ink-soft);max-width:46ch;margin:0 auto 6px;font-size:14px}
+.done p .en{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+.done .again{margin-top:26px}
+footer{max-width:900px;margin:0 auto;padding:8px 22px 40px;color:var(--muted);font-size:11.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="crest">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3L3 8l9 5 9-5-9-5z" fill="currentColor" opacity=".9"/><path d="M6 10.5V15c0 1.4 2.7 3 6 3s6-1.6 6-3v-4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M21 8v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    AIDE · 留学申请
+  </div>
+  <h1>VTAC 注册信息表<span class="en">VTAC Registration Information Form</span></h1>
+  <p class="lede">
+    请填写以下信息,我们将协助你完成 VTAC(维多利亚州高等教育招生中心)的注册与资料填写。大部分为选择项,填起来很快。
+    <span class="en">Please complete the details below so we can help you register with VTAC and complete your profile. Most fields are quick multiple-choice.</span>
+  </p>
+  <div class="notice">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span><b>关于登录密码与验证码:</b>VTAC 注册时的邮箱 / 手机验证码会实时发送、很快过期,需要注册时你与顾问一起完成。此表只收集资料,密码可留空、届时与顾问当面设置。<span style="display:block;margin-top:4px;color:var(--muted)">Email/phone codes are sent in real time during registration and expire quickly — the account-creation step is done together with your advisor. This form only collects your details.</span></span>
+  </div>
+</header>
+
+<div class="railwrap"><div class="rail">
+  <div class="progress"><span id="progbar"></span></div>
+  <div class="railmeta"><span id="progpct">0%</span> 已完成</div>
+  <div class="savechip" id="savechip"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>草稿已存</div>
+</div></div>
+
+<main>
+  <div class="errbox" id="errbox"><h4>请补全以下必填项 · Please complete the required fields</h4><ul id="errlist"></ul></div>
+  <form id="appform" novalidate>
+
+    <!-- 1 ACCOUNT -->
+    <section class="section" id="sec-account">
+      <div class="sec-head"><span class="sec-num">1</span><h2 class="sec-title">账号信息<span class="en">Account details</span></h2></div>
+      <div class="sec-body">
+        <div class="sec-note">这个邮箱和手机号将用于接收 VTAC 的验证码和重要通知,请填写你本人常用、能随时查看的。<span class="en">This email and phone will receive VTAC verification codes and key notices — use ones you check regularly.</span></div>
+        <div class="grid">
+          <div class="field full"><label class="lb">常用邮箱 <span class="en">Email address</span><span class="req">*</span></label><input type="email" data-field="email" data-req placeholder="name@example.com"></div>
+          <div class="field"><label class="lb">手机国家区号 <span class="en">Country code</span><span class="req">*</span></label>
+            <select data-field="phoneCC" data-req><option value="">— 请选择 —</option><option>Australia (+61)</option><option>China (+86)</option><option>Hong Kong (+852)</option><option>Malaysia (+60)</option><option>Other 其他</option></select></div>
+          <div class="field"><label class="lb">手机号码 <span class="en">Mobile number</span><span class="req">*</span></label><input type="tel" data-field="phone" data-req></div>
+          <div class="field full"><label class="lb">希望设置的登录密码 <span class="en">Preferred password</span> <span class="en">(选填 optional)</span><span class="hint">可留空,注册时与顾问当场设置更安全 · Best left blank & set live with your advisor</span></label><input type="text" data-field="password" placeholder="留空即可 / leave blank"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 PERSONAL -->
+    <section class="section" id="sec-personal">
+      <div class="sec-head"><span class="sec-num">2</span><h2 class="sec-title">个人信息<span class="en">Personal details</span></h2></div>
+      <div class="sec-body">
+        <div class="sec-note">姓名请与护照 / 出生证明上的法定姓名完全一致(英文)。<span class="en">Enter your full legal name exactly as on your passport / birth certificate.</span></div>
+        <div class="grid">
+          <div class="field"><label class="lb">名 <span class="en">Given name</span><span class="req">*</span></label><input type="text" data-field="givenName" data-req></div>
+          <div class="field"><label class="lb">中间名 <span class="en">Middle name</span> <span class="en">(如有 if any)</span></label><input type="text" data-field="middleName"></div>
+          <div class="field"><label class="lb">姓 <span class="en">Surname / Last name</span><span class="req">*</span></label><input type="text" data-field="surname" data-req></div>
+          <div class="field"><label class="lb">常用名 <span class="en">Preferred name</span> <span class="en">(选填 optional)</span></label><input type="text" data-field="preferredName"></div>
+          <div class="field"><label class="lb">出生日期 <span class="en">Date of birth</span><span class="req">*</span></label><input type="date" data-field="dob" data-req></div>
+          <div class="field"><label class="lb">当前学业状态 <span class="en">Current education status</span><span class="req">*</span></label>
+            <select data-field="eduStatus" data-req>
+              <option value="">— 请选择 Select —</option>
+              <option>在读 / 刚完成 12 年级 · Currently studying / recently completed Year 12</option>
+              <option>往年已完成中学 · Completed secondary in a previous year</option>
+              <option>在读 / 曾就读大学(高等教育)· Current or previous higher education</option>
+              <option>在读 / 曾就读 TAFE / 职教 · Current or previous TAFE/VET</option>
+              <option>未完成中学 · Have not completed secondary education</option>
+              <option>工作 / 社会经验 · Work & life experience</option>
+            </select></div>
+          <div class="field full"><label class="lb">计划入学时间 <span class="en">Intended start</span><span class="req">*</span></label>
+            <div class="yn" data-yn="intake"><label><input type="radio" name="intake" value="February 二月"><span>二月 February</span></label><label><input type="radio" name="intake" value="July 七月"><span>七月 July</span></label></div></div>
+          <div class="field full"><label class="lb">是否曾用其他名字就读? <span class="en">Studied under a different / previous name?</span></label>
+            <div class="yn" data-yn="prevName"><label><input type="radio" name="prevName" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="prevName" value="No"><span>否 No</span></label></div></div>
+          <div class="field full" data-showif="prevName=Yes"><label class="lb">曾用名(姓 + 名)<span class="en">Previous name(s)</span></label><input type="text" data-field="prevNameDetail" placeholder="e.g. Surname, Given"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 CITIZENSHIP -->
+    <section class="section" id="sec-citizen">
+      <div class="sec-head"><span class="sec-num">3</span><h2 class="sec-title">公民与签证<span class="en">Citizenship & visa</span></h2></div>
+      <div class="sec-body">
+        <div class="field full" style="margin-bottom:16px"><label class="lb" style="margin-bottom:6px">你的身份 / 签证类型 <span class="en">Citizenship and visa</span><span class="req">*</span></label>
+          <div class="radio-list" data-radio="citizen">
+            <label><input type="radio" name="citizen" value="Australian citizen 澳洲公民"><span>我是澳大利亚公民 <span class="en">I am an Australian citizen</span></span></label>
+            <label><input type="radio" name="citizen" value="NZ citizen 新西兰公民"><span>我是新西兰公民 <span class="en">I am a New Zealand citizen</span></span></label>
+            <label><input type="radio" name="citizen" value="Australian PR 澳洲PR"><span>我是澳大利亚永久居民 <span class="en">I am a permanent Australian resident</span></span></label>
+            <label><input type="radio" name="citizen" value="Temporary/Student visa 临时/学生签证"><span>我持有临时居留签证或学生签证 <span class="en">I have a temporary resident or student visa</span></span></label>
+            <label><input type="radio" name="citizen" value="Will obtain student visa 即将办理学签"><span>我将办理澳洲学习 / 学生签证 <span class="en">I will be obtaining an Australian study/student visa</span></span></label>
+            <label><input type="radio" name="citizen" value="None of the above 以上都不是"><span>以上都不是 <span class="en">None of the above</span></span></label>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="field"><label class="lb">国籍(公民所属国)<span class="en">Country of citizenship</span><span class="req">*</span></label><input type="text" data-field="countryCitizen" data-req placeholder="e.g. China"></div>
+          <div class="field"><label class="lb">出生国家 <span class="en">Country of birth</span><span class="req">*</span></label><input type="text" data-field="countryBirth" data-req placeholder="e.g. China"></div>
+          <div class="field" data-showif-not="citizen=Australian citizen 澳洲公民"><label class="lb">抵达澳大利亚年份 <span class="en">Year of arrival in Australia</span></label><input type="number" data-field="yearArrival" placeholder="e.g. 2023" min="1950" max="2030"></div>
+          <div class="field"><label class="lb">在家主要使用的语言 <span class="en">Main language spoken at home</span><span class="req">*</span></label><input type="text" data-field="langHome" data-req placeholder="e.g. Mandarin"></div>
+          <div class="field" data-showif="citizen=Temporary/Student visa 临时/学生签证"><label class="lb">签证签发日期 <span class="en">Visa grant date</span></label><input type="date" data-field="visaGrant"></div>
+          <div class="field" data-showif="citizen=Temporary/Student visa 临时/学生签证"><label class="lb">签证类别 (subclass) <span class="en">Visa subclass</span><span class="hint">见签证信,如 500 · from your visa letter, e.g. 500</span></label><input type="text" data-field="visaSubclass" placeholder="e.g. 500"></div>
+          <div class="field full" data-filefield="visaLetter" data-showif="citizen=Temporary/Student visa 临时/学生签证"><label class="lb">签证信 / 签证扫描件 <span class="en">Visa grant letter</span> <span class="en">(选填 optional)</span></label></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 PASSPORT -->
+    <section class="section" id="sec-passport">
+      <div class="sec-head"><span class="sec-num">4</span><h2 class="sec-title">护照 / 旅行证件<span class="en">Passport / travel document</span></h2></div>
+      <div class="sec-body">
+        <div class="grid">
+          <div class="field full"><label class="lb">是否持有有效护照? <span class="en">Do you have a valid passport?</span><span class="req">*</span></label>
+            <div class="yn" data-yn="hasPassport"><label><input type="radio" name="hasPassport" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="hasPassport" value="No"><span>否 No</span></label></div></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">护照号码 <span class="en">Document number</span></label><input type="text" data-field="ppNo"></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">证件签发国 <span class="en">Country of document</span></label><input type="text" data-field="ppCountry" placeholder="e.g. China"></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">出生地 <span class="en">Place of birth</span></label><input type="text" data-field="ppPob" placeholder="e.g. Shanghai"></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">签发机关 / 地点 <span class="en">Place of issue / issuing authority</span></label><input type="text" data-field="ppAuthority"></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">签发日期 <span class="en">Date of issue</span></label><input type="date" data-field="ppIssue"></div>
+          <div class="field" data-showif="hasPassport=Yes"><label class="lb">到期日期 <span class="en">Date of expiry</span></label><input type="date" data-field="ppExpiry"></div>
+          <div class="field full" data-filefield="passportScan"><label class="lb">护照扫描件 <span class="en">Passport scan</span> <span class="en">(建议上传 recommended)</span></label></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 USI -->
+    <section class="section" id="sec-usi">
+      <div class="sec-head"><span class="sec-num">5</span><h2 class="sec-title">USI(唯一学生编号)<span class="en">Unique Student Identifier</span></h2></div>
+      <div class="sec-body">
+        <div class="sec-note">在澳洲高等院校就读必须有 USI。如果没有,顾问会协助你申请。<span class="en">A USI is required to study at an Australian tertiary institution. If you don't have one, your advisor will help you obtain it.</span></div>
+        <div class="grid">
+          <div class="field full"><label class="lb">你目前是否在澳大利亚境内? <span class="en">Are you currently in Australia?</span><span class="req">*</span></label>
+            <div class="yn" data-yn="inAus"><label><input type="radio" name="inAus" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="inAus" value="No"><span>否 No</span></label></div></div>
+          <div class="field full"><label class="lb">是否已有 USI? <span class="en">Do you already have a USI?</span></label>
+            <div class="yn" data-yn="hasUSI"><label><input type="radio" name="hasUSI" value="Yes"><span>有 Yes</span></label><label><input type="radio" name="hasUSI" value="No"><span>没有 No</span></label></div></div>
+          <div class="field full" data-showif="hasUSI=Yes"><label class="lb">USI 编号 <span class="en">USI number</span></label><input type="text" data-field="usi"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 LIVING -->
+    <section class="section" id="sec-living">
+      <div class="sec-head"><span class="sec-num">6</span><h2 class="sec-title">居住地址<span class="en">Living location</span></h2></div>
+      <div class="sec-body">
+        <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px">当前住址 · Current address</div>
+        <div class="grid">
+          <div class="field"><label class="lb">国家 <span class="en">Country</span><span class="req">*</span></label><input type="text" data-field="curCountry" data-req placeholder="e.g. Australia"></div>
+          <div class="field"><label class="lb">州 / 省 <span class="en">State</span></label>
+            <select data-field="curState"><option value="">—</option><option>VIC</option><option>NSW</option><option>QLD</option><option>SA</option><option>WA</option><option>TAS</option><option>NT</option><option>ACT</option><option>Overseas 海外</option></select></div>
+          <div class="field full"><label class="lb">街道地址 <span class="en">Street address</span><span class="req">*</span></label><input type="text" data-field="curStreet" data-req></div>
+          <div class="field"><label class="lb">城市 / 区 <span class="en">Suburb / City</span></label><input type="text" data-field="curSuburb"></div>
+          <div class="field"><label class="lb">邮编 <span class="en">Postcode</span></label><input type="text" data-field="curPost"></div>
+          <div class="field"><label class="lb">在此地址居住时长(年)<span class="en">Time here — years</span></label><input type="number" data-field="curYears" min="0" placeholder="0"></div>
+          <div class="field"><label class="lb">(月)<span class="en">months</span></label><input type="number" data-field="curMonths" min="0" max="11" placeholder="0"></div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--accent);margin:22px 0 10px">上一个住址 · Previous address <span style="font-weight:400;color:var(--muted)">(如在此址不满数年 / if under a few years here)</span></div>
+        <div class="grid">
+          <div class="field"><label class="lb">国家 <span class="en">Country</span></label><input type="text" data-field="prevCountry"></div>
+          <div class="field"><label class="lb">州 / 省 <span class="en">State</span></label><input type="text" data-field="prevState"></div>
+          <div class="field full"><label class="lb">街道地址 <span class="en">Street address</span></label><input type="text" data-field="prevStreet"></div>
+          <div class="field"><label class="lb">城市 / 区 <span class="en">Suburb / City</span></label><input type="text" data-field="prevSuburb"></div>
+          <div class="field"><label class="lb">邮编 <span class="en">Postcode</span></label><input type="text" data-field="prevPost"></div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--accent);margin:22px 0 10px">未来居住 · Future living</div>
+        <div class="grid">
+          <div class="field full"><label class="lb">是否需要为就读高等课程而搬家?<span class="en">Will you need to move to undertake a tertiary course?</span></label>
+            <div class="yn" data-yn="needMove"><label><input type="radio" name="needMove" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="needMove" value="No"><span>否 No</span></label></div></div>
+          <div class="field full"><label class="lb">是否计划住校?<span class="en">Do you plan to reside on-campus?</span></label>
+            <div class="yn" data-yn="onCampus"><label><input type="radio" name="onCampus" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="onCampus" value="No"><span>否 No</span></label></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 EDUCATION -->
+    <section class="section" id="sec-edu">
+      <div class="sec-head"><span class="sec-num">7</span><h2 class="sec-title">教育背景(中学)<span class="en">Education history — secondary</span></h2></div>
+      <div class="sec-body">
+        <div class="sec-note">请填写你的中学学历,可添加多条(如 12 年级、11 年级)。<span class="en">Add your secondary studies. You can add more than one (e.g. Year 12, Year 11).</span></div>
+        <div class="grid" style="margin-bottom:18px">
+          <div class="field full"><label class="lb">VCAA 号码 / 学生编号 <span class="en">VCAA student number</span><span class="hint">VCE 考生的维州课程与评估局编号,如有请填写 · If you sat the VCE, enter your VCAA number here</span></label><input type="text" data-field="vcaaId" placeholder="e.g. 1234567890"></div>
+        </div>
+        <div class="rows" id="eduRows"></div>
+        <button type="button" class="addrow" data-add="edu"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>添加一条学历 Add study</button>
+        <label class="checkline"><input type="checkbox" data-field="noSecondary" value="Yes"><span>我未完成中学教育 <span class="en">I did not finish secondary school</span></span></label>
+      </div>
+    </section>
+
+    <!-- 8 ABOUT / FAMILY -->
+    <section class="section" id="sec-about">
+      <div class="sec-head"><span class="sec-num">8</span><h2 class="sec-title">背景信息<span class="en">About you & family</span></h2></div>
+      <div class="sec-body">
+        <div class="sec-note">VTAC 用这些信息评估奖学金 / 特殊入学计划(SEAS)资格。<span class="en">VTAC uses this to assess eligibility for SEAS and equity scholarships.</span></div>
+        <div class="field full" style="margin-bottom:16px"><label class="lb" style="margin-bottom:6px">是否为澳洲原住民 / 托雷斯海峡岛民后裔?<span class="en">Are you of Aboriginal or Torres Strait Islander descent?</span></label>
+          <div class="radio-list" data-radio="indigenous">
+            <label><input type="radio" name="indigenous" value="Aboriginal"><span>是,原住民 <span class="en">Yes, Aboriginal</span></span></label>
+            <label><input type="radio" name="indigenous" value="Torres Strait Islander"><span>是,托雷斯海峡岛民 <span class="en">Yes, Torres Strait Islander</span></span></label>
+            <label><input type="radio" name="indigenous" value="Both"><span>两者皆是 <span class="en">Yes, both</span></span></label>
+            <label><input type="radio" name="indigenous" value="Neither"><span>都不是 <span class="en">Neither</span></span></label>
+            <label><input type="radio" name="indigenous" value="Prefer not to say"><span>不愿透露 <span class="en">I prefer not to say</span></span></label>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="field"><label class="lb">主要抚养人最高学历 <span class="en">Highest education of primary carer</span></label>
+            <select data-field="carer1"><option value="">—</option><option>Postgraduate 研究生</option><option>Bachelor degree 本科</option><option>Diploma / Advanced Diploma 大专</option><option>Certificate 证书</option><option>Year 12 高中毕业</option><option>Year 11 or below 高二及以下</option><option>Unknown 不清楚</option></select></div>
+          <div class="field"><label class="lb">次要抚养人最高学历 <span class="en">Secondary carer (if any)</span></label>
+            <select data-field="carer2"><option value="">—</option><option>Postgraduate 研究生</option><option>Bachelor degree 本科</option><option>Diploma / Advanced Diploma 大专</option><option>Certificate 证书</option><option>Year 12 高中毕业</option><option>Year 11 or below 高二及以下</option><option>Unknown 不清楚</option><option>N/A 无</option></select></div>
+          <div class="field full"><label class="lb">是否有兄弟姐妹上过大学?<span class="en">Do you have siblings who have attended university?</span></label>
+            <div class="yn" data-yn="siblingUni"><label><input type="radio" name="siblingUni" value="Yes"><span>是 Yes</span></label><label><input type="radio" name="siblingUni" value="No"><span>否 No</span></label></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 CONSENT -->
+    <section class="section" id="sec-consent">
+      <div class="sec-head"><span class="sec-num">9</span><h2 class="sec-title">授权与确认<span class="en">Authorization</span></h2></div>
+      <div class="sec-body">
+        <label class="agree" id="agreeBox"><input type="radio" name="agree" value="Yes"><span class="t">本人确认以上信息真实准确,并授权 AIDE 使用这些信息协助我完成 VTAC 注册与课程申请,同意将 AIDE 设为我在 VTAC 的授权代理人(Authorised nominee)。<span class="en">I confirm the above is true and accurate, and authorise AIDE to use it to assist my VTAC registration and course applications, and to be nominated as my authorised nominee/agent on VTAC.</span></span></label>
+        <div class="grid" style="margin-top:16px">
+          <div class="field"><label class="lb">签名(姓名)<span class="en">Signature (typed name)</span></label><input type="text" data-field="sigName"></div>
+          <div class="field"><label class="lb">日期 <span class="en">Date</span></label><input type="date" data-field="sigDate"></div>
+        </div>
+      </div>
+    </section>
+  </form>
+</main>
+
+<div class="submitbar"><div class="submitinner">
+  <div class="submit-note">完成后点击生成,系统会打包一个 ZIP(含 Excel 与所有附件)供你下载并发回给顾问。<br><span style="color:var(--muted)">Generates a ZIP (Excel + attachments) to download and send back to your advisor.</span></div>
+  <button type="button" class="btn btn-primary" id="submitBtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>生成并下载 Generate & download</button>
+</div></div>
+
+<div class="done" id="doneScreen">
+  <div class="ring"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <h2>信息已生成 Details ready</h2>
+  <p>你的信息包(Excel + 附件)已开始下载。请把 ZIP 文件发送给你的顾问,我们会尽快协助你完成 VTAC 注册。<span class="en">Your package has downloaded. Send the ZIP to your advisor and we'll help you register with VTAC.</span></p>
+  <button type="button" class="btn btn-ghost again" id="backBtn">返回修改 Back to form</button>
+</div>
+
+<footer>此表由 AIDE 用于收集 VTAC 注册所需信息,不代表 VTAC 已受理注册。 · Collected by AIDE to assist your VTAC registration.</footer>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const LS_KEY="aide_vtac_draft_v1";
+const files={};
+
+function fmtSize(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(0)+' KB';return (b/1048576).toFixed(1)+' MB';}
+function mountFileField(container,key,multiple){
+  const dz=document.createElement('label');dz.className='dropzone';
+  dz.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L8 8m4-4l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span class="dz-text"><b>点击上传</b> 或拖入文件<small>Click to upload or drag files · JPG / PNG / PDF</small></span>';
+  const inp=document.createElement('input');inp.type='file';inp.style.display='none';inp.accept='image/*,.pdf';if(multiple)inp.multiple=true;
+  const list=document.createElement('div');list.className='filelist';
+  dz.appendChild(inp);container.appendChild(dz);container.appendChild(list);container.classList.add('file-field');
+  files[key]=files[key]||[];
+  function render(){list.innerHTML='';files[key].forEach((f,i)=>{const chip=document.createElement('div');chip.className='filechip';chip.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6"/><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V8l-6-5z" stroke="currentColor" stroke-width="1.6" fill="none"/></svg><span class="nm"></span><span class="sz"></span><button type="button" aria-label="remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>';chip.querySelector('.nm').textContent=f.name;chip.querySelector('.sz').textContent=fmtSize(f.size);chip.querySelector('button').onclick=()=>{files[key].splice(i,1);render();updateProgress();};list.appendChild(chip);});}
+  function add(fl){for(const f of fl){if(f.size>20*1024*1024){alert('文件 "'+f.name+'" 超过 20MB。\nFile exceeds 20MB.');continue;}files[key].push({name:f.name,size:f.size,blob:f});}if(!multiple&&files[key].length>1)files[key]=[files[key][files[key].length-1]];render();updateProgress();}
+  inp.addEventListener('change',e=>{add(e.target.files);inp.value='';});
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{if(e.dataTransfer.files.length)add(e.dataTransfer.files);});
+}
+$$('[data-filefield]').forEach(el=>mountFileField(el,el.getAttribute('data-filefield'),false));
+
+/* education rows */
+const eduCols=[
+  {f:'country',lb:'就读国家 Country',type:'select',opts:['Australia 澳大利亚','New Zealand 新西兰','Other 其他']},
+  {f:'state',lb:'州 State',type:'text',ph:'e.g. Victoria'},
+  {f:'yearLevel',lb:'年级 Year level',type:'select',opts:['Year 12','Year 11','Year 10','Other']},
+  {f:'yearComp',lb:'完成年份 Year of completion',type:'number',ph:'e.g. 2025'},
+  {f:'qual',lb:'学历名称 Qualification',type:'select',opts:['VCE','IB','NSW HSC','Interstate Year 12','International qualification 国际学历','Other']},
+  {f:'studentNo',lb:'学号 Student number',type:'text'},
+  {f:'school',lb:'学校名称 School name',type:'text',full:true}
+];
+function buildRow(cols,tag){
+  const card=document.createElement('div');card.className='rowcard';
+  const t=document.createElement('span');t.className='rowtag';t.textContent=tag;card.appendChild(t);
+  const rm=document.createElement('button');rm.type='button';rm.className='rmrow';rm.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';rm.onclick=()=>{card.remove();updateProgress();saveDraft();};card.appendChild(rm);
+  const grid=document.createElement('div');grid.className='grid';
+  cols.forEach(c=>{const fd=document.createElement('div');fd.className='field'+(c.full?' full':'');const lb=document.createElement('label');lb.className='lb';lb.textContent=c.lb;fd.appendChild(lb);let inp;if(c.type==='select'){inp=document.createElement('select');inp.innerHTML='<option value="">—</option>'+c.opts.map(o=>'<option>'+o+'</option>').join('');}else{inp=document.createElement('input');inp.type=c.type||'text';if(c.ph)inp.placeholder=c.ph;}inp.setAttribute('data-rowfield',c.f);fd.appendChild(inp);grid.appendChild(fd);});
+  card.appendChild(grid);return card;
+}
+function addEdu(tag){$('#eduRows').appendChild(buildRow(eduCols,tag||'中学 Secondary'));}
+
+/* conditional show/hide */
+function applyShowIf(){
+  $$('[data-showif]').forEach(el=>{const [name,val]=el.getAttribute('data-showif').split('=');const c=$('input[name="'+name+'"]:checked');el.style.display=(c&&c.value===val)?'':'none';});
+  $$('[data-showif-not]').forEach(el=>{const [name,val]=el.getAttribute('data-showif-not').split('=');const c=$('input[name="'+name+'"]:checked');el.style.display=(c&&c.value===val)?'none':'';});
+}
+document.addEventListener('change',e=>{if(e.target.name)applyShowIf();});
+
+/* progress */
+function updateProgress(){
+  let total=0,done=0;
+  $$('[data-req]').forEach(el=>{total++;if(el.value&&el.value.trim())done++;});
+  $$('[data-yn][data-req],[data-yn]').forEach(()=>{});
+  ['intake','citizen','hasPassport','inAus'].forEach(n=>{total++;if($('input[name="'+n+'"]:checked'))done++;});
+  total++;if($('input[name="agree"]:checked'))done++;
+  const pct=total?Math.round(done/total*100):0;$('#progbar').style.width=pct+'%';$('#progpct').textContent=pct+'%';
+}
+
+/* draft */
+let saveTimer;
+function saveDraft(){try{const data={fields:{},radios:{},checks:{},edu:[]};$$('[data-field]').forEach(el=>{if(el.type==='checkbox'){if(el.checked)data.checks[el.getAttribute('data-field')]=true;}else if(el.value)data.fields[el.getAttribute('data-field')]=el.value;});$$('input[type=radio]:checked').forEach(el=>data.radios[el.name]=el.value);$$('#eduRows .rowcard').forEach(card=>{const row={};$$('[data-rowfield]',card).forEach(i=>{if(i.value)row[i.getAttribute('data-rowfield')]=i.value;});row.__tag=card.querySelector('.rowtag').textContent;data.edu.push(row);});localStorage.setItem(LS_KEY,JSON.stringify(data));const chip=$('#savechip');chip.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>chip.classList.remove('show'),1400);}catch(e){}}
+function restoreDraft(){let data;try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;data=JSON.parse(raw);}catch(e){return;}if(data.edu&&data.edu.length){$('#eduRows').innerHTML='';data.edu.forEach(row=>{addEdu(row.__tag);const card=$('#eduRows').lastElementChild;$$('[data-rowfield]',card).forEach(i=>{const v=row[i.getAttribute('data-rowfield')];if(v!=null)i.value=v;});});}if(data.fields)Object.entries(data.fields).forEach(([k,v])=>{const el=$('[data-field="'+k+'"]');if(el&&el.type!=='checkbox')el.value=v;});if(data.checks)Object.keys(data.checks).forEach(k=>{const el=$('[data-field="'+k+'"]');if(el)el.checked=true;});if(data.radios)Object.entries(data.radios).forEach(([k,v])=>{const el=$('input[name="'+k+'"][value="'+CSS.escape(v)+'"]');if(el){el.checked=true;}});}
+
+/* validation */
+function validate(){
+  const errs=[];$$('.invalid').forEach(el=>el.classList.remove('invalid'));
+  $$('[data-req]').forEach(el=>{if(!el.value||!el.value.trim()){el.classList.add('invalid');errs.push({el,label:reqLabel(el)});}});
+  const email=$('[data-field="email"]');if(email.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){email.classList.add('invalid');errs.push({el:email,label:'邮箱格式不正确 Invalid email'});}
+  [['intake','计划入学时间 Intended start'],['citizen','身份 / 签证类型 Citizenship'],['hasPassport','是否有护照 Passport'],['inAus','是否在澳境内 In Australia']].forEach(([n,lb])=>{if(!$('input[name="'+n+'"]:checked')){const box=$('[data-yn="'+n+'"]')||$('[data-radio="'+n+'"]');if(box)box.classList.add('invalid');errs.push({el:box||email,label:lb});}});
+  if(!$('input[name="agree"]:checked')){$('#agreeBox').classList.add('invalid');errs.push({el:$('#agreeBox'),label:'请勾选授权确认 Agree to authorization'});}
+  return errs;
+}
+function reqLabel(el){const f=el.closest('.field');const l=f&&f.querySelector('.lb');return l?l.textContent.replace(/\s*\*$/,'').trim():'必填项';}
+
+/* collect + export */
+function val(f){const el=$('[data-field="'+f+'"]');if(!el)return '';if(el.type==='checkbox')return el.checked?'Yes':'';return el.value;}
+function rad(n){const el=$('input[name="'+n+'"]:checked');return el?el.value:'';}
+function collectEdu(){const out=[];$$('#eduRows .rowcard').forEach(card=>{const row={};$$('[data-rowfield]',card).forEach(i=>row[i.getAttribute('data-rowfield')]=i.value);if(Object.values(row).some(v=>v))out.push(row);});return out;}
+
+async function buildWorkbook(){
+  const wb=XLSX.utils.book_new();
+  const m=[['VTAC 注册信息表 · VTAC Registration Form'],[],['字段 Field (中文)','Field (EN)','填写内容 Value']];
+  const P=(zh,en,v)=>m.push([zh,en,v||'']);
+  m.push(['— 账号 Account —','','']);
+  P('邮箱','Email',val('email'));P('手机区号','Country code',val('phoneCC'));P('手机号','Mobile',val('phone'));P('登录密码','Password',val('password'));
+  m.push(['— 个人 Personal —','','']);
+  P('名','Given name',val('givenName'));P('中间名','Middle name',val('middleName'));P('姓','Surname',val('surname'));P('常用名','Preferred name',val('preferredName'));P('出生日期','DOB',val('dob'));P('学业状态','Education status',val('eduStatus'));P('入学时间','Intended start',rad('intake'));P('曾用名','Previous name?',rad('prevName'));P('曾用名详情','Previous name detail',val('prevNameDetail'));
+  m.push(['— 公民与签证 Citizenship & visa —','','']);
+  P('身份/签证','Citizenship/visa',rad('citizen'));P('国籍','Country of citizenship',val('countryCitizen'));P('出生国','Country of birth',val('countryBirth'));P('抵澳年份','Year of arrival',val('yearArrival'));P('家庭语言','Language at home',val('langHome'));P('签证签发日','Visa grant date',val('visaGrant'));P('签证类别','Visa subclass',val('visaSubclass'));
+  m.push(['— 护照 Passport —','','']);
+  P('有护照','Has passport',rad('hasPassport'));P('护照号','Document number',val('ppNo'));P('签发国','Country of doc',val('ppCountry'));P('出生地','Place of birth',val('ppPob'));P('签发机关','Issuing authority',val('ppAuthority'));P('签发日','Issue date',val('ppIssue'));P('到期日','Expiry date',val('ppExpiry'));
+  m.push(['— USI —','','']);
+  P('在澳境内','In Australia',rad('inAus'));P('已有USI','Has USI',rad('hasUSI'));P('USI编号','USI number',val('usi'));P('VCAA号码','VCAA number',val('vcaaId'));
+  m.push(['— 居住 Living —','','']);
+  P('当前国家','Current country',val('curCountry'));P('州','State',val('curState'));P('街道','Street',val('curStreet'));P('城市/区','Suburb',val('curSuburb'));P('邮编','Postcode',val('curPost'));P('居住时长(年)','Years here',val('curYears'));P('(月)','Months here',val('curMonths'));
+  P('上一住址-国家','Prev country',val('prevCountry'));P('上一住址-州','Prev state',val('prevState'));P('上一住址-街道','Prev street',val('prevStreet'));P('上一住址-城市','Prev suburb',val('prevSuburb'));P('上一住址-邮编','Prev postcode',val('prevPost'));
+  P('需搬家','Need to move',rad('needMove'));P('住校','On-campus',rad('onCampus'));
+  m.push(['— 背景 About —','','']);
+  P('原住民/岛民','Aboriginal/TSI',rad('indigenous'));P('主抚养人学历','Primary carer edu',val('carer1'));P('次抚养人学历','Secondary carer edu',val('carer2'));P('兄弟姐妹上过大学','Sibling at uni',rad('siblingUni'));P('未完成中学','Did not finish secondary',val('noSecondary'));
+  m.push(['— 授权 Authorization —','','']);
+  P('已授权','Authorised',rad('agree'));P('签名','Signature',val('sigName'));P('日期','Date',val('sigDate'));
+  const ws=XLSX.utils.aoa_to_sheet(m);ws['!cols']=[{wch:24},{wch:26},{wch:50}];XLSX.utils.book_append_sheet(wb,ws,'VTAC 信息 Info');
+  const edu=collectEdu();const ea=[['就读国家 Country','州 State','年级 Year level','完成年份 Year','学历 Qualification','学号 Student no.','学校 School']];edu.forEach(r=>ea.push([r.country||'',r.state||'',r.yearLevel||'',r.yearComp||'',r.qual||'',r.studentNo||'',r.school||'']));const ews=XLSX.utils.aoa_to_sheet(ea);ews['!cols']=[{wch:18},{wch:14},{wch:12},{wch:12},{wch:24},{wch:16},{wch:30}];XLSX.utils.book_append_sheet(wb,ews,'教育 Education');
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function safeName(s){return (s||'Student').replace(/[^\w\u4e00-\u9fa5-]+/g,'_').slice(0,40);}
+async function saveFile(filename,blob){
+  try{if(window.claude&&typeof window.claude.use==='function'){const dl=await window.claude.use('downloads');if(dl){try{await dl.save({filename,data:blob});return true;}catch(e){if(e&&e.code==='declined')return false;}}}}catch(e){}
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);return true;
+}
+async function generate(){
+  const errs=validate();const eb=$('#errbox'),ul=$('#errlist');
+  if(errs.length){ul.innerHTML='';errs.slice(0,12).forEach(er=>{const li=document.createElement('li');const a=document.createElement('a');a.textContent=er.label;a.onclick=()=>{er.el.scrollIntoView({behavior:'smooth',block:'center'});const t=er.el.querySelector&&er.el.querySelector('input,textarea,select');(t||er.el).focus&&(t||er.el).focus();};li.appendChild(a);ul.appendChild(li);});eb.classList.add('show');eb.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  eb.classList.remove('show');
+  const btn=$('#submitBtn');const lab=btn.innerHTML;btn.disabled=true;btn.innerHTML='正在打包… Packaging…';
+  try{
+    const name=safeName(val('surname')+val('givenName')||val('sigName'));
+    const zip=new JSZip();const folder=zip.folder('VTAC_'+name);
+    folder.file('VTAC_'+name+'.xlsx',await buildWorkbook());
+    const att=folder.folder('Attachments 附件');
+    for(const key of Object.keys(files)){(files[key]||[]).forEach((f,i)=>{const ext=(f.name.match(/\.[^.]+$/)||[''])[0];att.file(key+((files[key].length>1)?('_'+(i+1)):'')+ext,f.blob);});}
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    const ok=await saveFile('VTAC_'+name+'.zip',zipBlob);
+    if(ok){$('#appform').style.display='none';$('.submitbar').style.display='none';$('#doneScreen').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});}
+  }catch(err){alert('生成时出错,请重试。\nError generating file.\n\n'+(err&&err.message||err));}
+  finally{btn.disabled=false;btn.innerHTML=lab;}
+}
+$('#submitBtn').addEventListener('click',generate);
+$('#backBtn').addEventListener('click',()=>{$('#doneScreen').classList.remove('show');$('#appform').style.display='';$('.submitbar').style.display='';});
+
+/* init */
+addEdu('Year 12 · 12年级');
+restoreDraft();
+if(!$('[data-field="sigDate"]').value)$('[data-field="sigDate"]').value=new Date().toISOString().slice(0,10);
+applyShowIf();updateProgress();
+document.addEventListener('input',()=>{updateProgress();clearTimeout(saveTimer);saveTimer=setTimeout(saveDraft,600);});
+document.addEventListener('change',()=>{updateProgress();saveDraft();});
+$$('[data-add]').forEach(b=>b.addEventListener('click',()=>{addEdu('中学 Secondary');updateProgress();}));
+})();
+</script>
+</body>
+</html>
